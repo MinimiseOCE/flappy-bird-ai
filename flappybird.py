@@ -181,7 +181,18 @@ def draw_window(win, bird, pipes, base, score):
 
 # Main Game Function
 def main(genomes, config):
-    birds = Bird(230,350)
+    nets = []
+    ge = []
+    birds = []
+
+    for g in genomes:
+        net = neat.nn.FeedForwardNetwork(g, config)
+        nets.append(net)
+        birds.append(Bird(230,350))
+        g.fitness = 0
+        ge.append(g)
+
+
     base = Base(730)
     pipes = [Pipe(600)]
     win = pygame.display.set_mode((WIN_WIDTH,WIN_HEIGHT))
@@ -199,9 +210,12 @@ def main(genomes, config):
         add_pipe = False
         rem = []
         for pipe in pipes:
-            for bird in birds:
+            for x, bird in enumrate(birds):
                 if pipe.collide(bird):
-                    pass
+                    ge[x].fitness -= 1
+                    birds.pop(x)
+                    nets.pop(x)
+                    ge.pop(x)
                 
                 if not pipe.passed and pipe.x < bird.x:
                     pipe.passed = True
@@ -214,14 +228,18 @@ def main(genomes, config):
 
         if add_pipe:
             score += 1
+            for g in ge:
+                g.fitness += 5
             pipes.append(Pipe(600))
 
         for r in rem:
             pipes.remove(r)
 
-        for bird in birds:
+        for x, bird in enumerate(birds):
             if bird.y + bird.img.get_height() >= 730:
-                pass
+                birds.pop(x)
+                nets.pop(x)
+                ge.pop(x)
 
         base.move()
         draw_window(win, bird, pipes, base, score)
