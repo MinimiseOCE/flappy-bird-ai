@@ -181,7 +181,7 @@ def draw_window(win, bird, pipes, base, score):
 
 # Main Game Function
 def main(genomes, config):
-    bird = Bird(230,350)
+    birds = Bird(230,350)
     base = Base(730)
     pipes = [Pipe(600)]
     win = pygame.display.set_mode((WIN_WIDTH,WIN_HEIGHT))
@@ -199,15 +199,16 @@ def main(genomes, config):
         add_pipe = False
         rem = []
         for pipe in pipes:
-            if pipe.collide(bird):
-                pass
-            
+            for bird in birds:
+                if pipe.collide(bird):
+                    pass
+                
+                if not pipe.passed and pipe.x < bird.x:
+                    pipe.passed = True
+                    add_pipe = True
+
             if pipe.x + pipe.PIPE_TOP.get_width() < 0:
-                rem.append(pipe)
-            
-            if not pipe.passed and pipe.x < bird.x:
-                pipe.passed = True
-                add_pipe = True
+                    rem.append(pipe)
 
             pipe.move()
 
@@ -218,8 +219,9 @@ def main(genomes, config):
         for r in rem:
             pipes.remove(r)
 
-        if bird.y + bird.img.get_height() >= 730:
-            pass
+        for bird in birds:
+            if bird.y + bird.img.get_height() >= 730:
+                pass
 
         base.move()
         draw_window(win, bird, pipes, base, score)
