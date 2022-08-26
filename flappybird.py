@@ -9,6 +9,8 @@ pygame.font.init()
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
+GEN = 0
+
 # Import sprites
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join('imgs','bird1.png'))),pygame.transform.scale2x(pygame.image.load(os.path.join('imgs','bird2.png'))),pygame.transform.scale2x(pygame.image.load(os.path.join('imgs','bird3.png')))]
 PIPE_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs','pipe.png')))
@@ -166,7 +168,7 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 # Draws the game sprites
-def draw_window(win, birds, pipes, base, score):
+def draw_window(win, birds, pipes, base, score, gen):
     win.blit(BG_IMG, (0,0))
 
     for pipe in pipes:
@@ -176,6 +178,10 @@ def draw_window(win, birds, pipes, base, score):
     text = STAT_FONT.render('Score: ' + str(score), 1, (255,255,255))
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
 
+    # Render gens
+    text = STAT_FONT.render('Gen: ' + str(gen), 1, (255,255,255))
+    win.blit(text, (10, 10))
+
     base.draw(win)
     
     for bird in birds:
@@ -184,6 +190,8 @@ def draw_window(win, birds, pipes, base, score):
 
 # Main Game Function
 def main(genomes, config):
+    global GEN
+    GEN += 1
     nets = []
     ge = []
     birds = []
@@ -262,7 +270,7 @@ def main(genomes, config):
                 birds.remove(bird)
 
         base.move()
-        draw_window(win, birds, pipes, base, score)
+        draw_window(win, birds, pipes, base, score, GEN)
 
         
 
